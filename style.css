@@ -1,0 +1,527 @@
+/* =========================
+   1. GLOBAL LAYOUT
+========================= */
+
+body {
+  margin: 0;
+}
+
+.page-div {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.game-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  column-gap: 32px;
+  border: 3px solid black;
+  padding: 10px 130px;
+  transition: background-color 0.2s;
+}
+
+.game-details {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  min-height: 350px;
+  font-family: "Share Tech Mono", monospace;
+}
+
+.game-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  flex: 1;
+  background-color: #292929;
+  color: white;
+  max-width: 500px;
+  row-gap: 20px;
+  font-size: 20px;
+  padding: 20px;
+}
+
+/* =========================
+   2. SIDEBAR, MENUS, FORMS
+========================= */
+
+.sidebar {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 20px;
+  width: 320px;
+  height: 100%;
+  transform: translate(-100%);
+  transition: transform 0.3s ease;
+  padding: 150px 20px 20px;
+  background-color: white;
+  box-shadow: 10px 0 10px rgba(0, 0, 0, 0.199);
+  z-index: 2;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.menu-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 45px;
+  height: 45px;
+  padding: 0;
+  border: 2px solid black;
+  background-color: #292929;
+  background-image: url("Icons/menu-icon-white.png");
+  background-position: center;
+  background-size: contain;
+  cursor: pointer;
+  transition: background-color 0.5s, background-image 0.5s, transform 0.1s;
+}
+
+.menu-button:hover {
+  background-color: #ffffff;
+  background-image: url("Icons/menu-icon-black.png");
+}
+
+.menu-button:active {
+  transform: scale(95%);
+}
+
+.game-logo {
+  position: absolute;
+  top: 10px;
+  left: 82px;
+  width: 220px;
+}
+
+.form-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 50px;
+}
+
+.player-name-div {
+  display: flex;
+  column-gap: 50px;
+  row-gap: 20px;
+  font-family: "Share Tech Mono", monospace;
+}
+
+.player-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 20px;
+  font-weight: bold;
+}
+
+.ui-button {
+  width: 100%;
+  height: 80px;
+  border: 2px solid black;
+  background-color: #292929;
+  color: white;
+  cursor: pointer;
+  font-family: "Share Tech Mono", monospace;
+  transition: background-color 0.5s, color 0.5s, transform 0.1s;
+}
+
+.ui-button:hover {
+  background-color: #ffffff;
+  color: black;
+}
+
+.ui-button:active {
+  transform: scale(95%);
+}
+
+.text-box {
+  width: 300px;
+  height: 60px;
+  padding: 10px;
+  border: 2px solid black;
+  background-color: white;
+  outline: none;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 20px;
+}
+
+.text-box::placeholder {
+  font-family: "Share Tech Mono", monospace;
+}
+
+/* =========================
+   3. OVERLAYS
+========================= */
+
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(122, 122, 122, 0.85);
+  backdrop-filter: blur(35px);
+  cursor: pointer;
+}
+
+.overlay-text {
+  color: white;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  font-family: "Share Tech Mono", monospace;
+  font-size: 50px;
+}
+
+.startgame-overlay,
+.savedlist-overlay,
+.rules-overlay {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+  transition: opacity 0.3s;
+}
+
+.startgame-overlay {
+  padding-left: 320px;
+  background-color: rgba(122, 122, 122, 0.794);
+  backdrop-filter: blur(9px);
+}
+
+.startgame-overlay.show {
+  pointer-events: all;
+  opacity: 1;
+}
+
+.savedlist-overlay {
+  padding-left: 360px;
+  background-color: rgb(255, 255, 255);
+}
+
+.savedlist-overlay.show {
+  pointer-events: all;
+  opacity: 1;
+}
+
+.savedlist-overlay.none {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 40px;
+}
+
+.rules-overlay {
+  padding-left: 360px;
+  background-color: rgb(255, 255, 255);
+  font-family: "Share Tech Mono", monospace;
+  font-size: 20px;
+}
+
+.rules-overlay.show {
+  opacity: 1;
+}
+
+.saved-games-list {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  width: 550px;
+  border-bottom: none;
+}
+
+.save-div {
+  display: grid;
+  align-items: center;
+  width: 100%;
+  grid-template-columns: 1fr 250px 80px;
+  column-gap: 10px;
+  font-family: "Share Tech Mono", monospace;
+}
+
+.save-div div:first-child {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* =========================
+   4. BOARDS
+========================= */
+
+.board {
+  position: relative;
+  display: grid;
+  width: 100%;
+  max-width: 560px;
+  grid-template-columns: repeat(10, 1fr);
+  border: 3px solid rgb(85, 85, 85);
+  background-color: white;
+}
+
+.board-cover-div {
+  position: absolute;
+  inset: 0;
+  background-image: url("cover.png");
+}
+
+.cell-style,
+.boat-hud-cellstyle {
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+  border: 1px solid gray;
+  background-color: white;
+}
+
+.cell-style {
+  width: 100%;
+}
+
+.boat-hud-cellstyle {
+  width: 52px;
+}
+
+.board-cover {
+  background-color: rgb(187, 187, 187);
+}
+
+/* =========================
+   5. CELL PREVIEW & STATES
+========================= */
+
+.preview-boat {
+  background-color: lightgray;
+}
+
+.preview-attack {
+  background-image: url("icons/cell-target.png");
+  background-size: cover;
+}
+
+.supply-boat {
+  border: 2px solid rgb(212, 192, 105);
+  background-color: rgb(255, 249, 217);
+}
+
+.placed-boat-player1 {
+  border: 2px solid rgb(105, 185, 212);
+  background-color: rgb(217, 246, 255);
+}
+
+.placed-boat-player2 {
+  border: 2px solid rgb(212, 105, 105);
+  background-color: rgb(255, 217, 217);
+}
+
+.hit-cell {
+  background-image: url("icons/cell-hit.png");
+  background-size: cover;
+}
+
+.shield-cell {
+  background-image: url("icons/shield.png");
+  background-size: cover;
+}
+
+.broken-shield {
+  background-image: url("icons/broken-shield.png");
+  background-size: cover;
+}
+
+.revealed {
+  background-image: url("icons/revealed.png");
+  background-size: cover;
+}
+
+/* =========================
+   6. HUD, INVENTORY, CONTROLS
+========================= */
+
+.boat-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  row-gap: 7px;
+  padding: 20px;
+  border: 2px solid black;
+  border-top: none;
+  background-color: #292929;
+  color: white;
+}
+
+.button-div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 250px;
+  font-size: 18px;
+}
+
+.boat-select-button {
+  width: 100px;
+  padding: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 17px;
+  transition: transform 0.15s, border 0.2s, background-color 0.2s;
+}
+
+.boat-select-button:hover,
+.player-powerup-div:hover {
+  transform: scale(98%);
+}
+
+.boat-select-button.selected,
+.player-powerup-div.selected {
+  border: 2px solid black;
+  background-color: rgb(238, 238, 238);
+}
+
+.fleet-hud {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  row-gap: 20px;
+  column-gap: 20px;
+  flex: 1;
+  max-height: 350px;
+  box-sizing: border-box;
+  padding: 20px;
+  padding-top: 30px;
+  border: 2px solid black;
+  border-top: none;
+  border-left: none;
+  background-color: rgb(187, 187, 187);
+}
+
+.boat-hud {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  width: fit-content;
+  box-sizing: border-box;
+}
+
+.boat-text {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 2px;
+}
+
+.boat-stats {
+  display: flex;
+  width: fit-content;
+  height: 100%;
+  box-shadow: 2px 2px 5px black;
+}
+
+.player-inventory-div {
+  display: flex;
+  flex-direction: column;
+}
+
+.inventory-title {
+  padding: 15px;
+  border: 2px solid black;
+  border-top: none;
+  background-color: #292929;
+  color: white;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 25px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.player-inventory {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex: 1;
+  width: 300px;
+  box-sizing: border-box;
+  padding: 20px;
+  border: 2px solid black;
+  border-top: none;
+  background-color: #292929;
+}
+
+.empty-inventory-text {
+  color: rgba(255, 255, 255, 0.533);
+  font-family: "Share Tech Mono", monospace;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.player-powerup-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  row-gap: 5px;
+  width: 100px;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 13px;
+  border: 2px solid black;
+  cursor: pointer;
+  transition: transform 0.2s, border 0.2s, background-color 0.2s;
+}
+
+.player-powerup-div-text {
+  text-align: center;
+  font-family: inherit;
+}
+
+.player-powerup-div-image {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+
+.player1-hudcolour {
+  border: 2px solid black;
+  background-color: rgb(105, 185, 212);
+}
+
+.player2-hudcolour {
+  border: 2px solid black;
+  background-color: rgb(212, 105, 105);
+}
+
+.stats-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #929292;
+  width: 100%;
+}
+
+/* =========================
+   7. UTILITIES
+========================= */
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 1800px) {
+  .fleet-hud {
+    flex-wrap: nowrap;
+    max-height: none;
+  }
+}

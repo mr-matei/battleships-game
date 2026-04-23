@@ -1,0 +1,159 @@
+<html>
+  <head>
+    <title>Battleships: Supply Run</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="overlay" onclick="switchTurn()">
+      <div class="overlay-text"></div>
+    </div>
+    <button class="menu-button" onclick="openSidebar()" id="openButton"></button>
+      <div class="sidebar">
+        <button class="menu-button" onclick="closeSidebar()" id="closeButton"></button>
+        <img class="game-logo" src="game-logo.png">
+        <button class="ui-button" onclick="saveGame()">SAVE GAME</button>
+        <button class="ui-button" onclick="showSavedGames()">LOAD GAME</button>
+        <button class="ui-button" onclick="showRules()">RULES</button>
+      </div>
+      <div class="startgame-overlay">
+        <form id="player-form" class="form-div">
+          <div class="player-name-div">
+            <div class="player-div">
+              <label>Player 1:</label>
+              <input class="text-box" type="text" id="player1Name" placeholder="Type username" required>
+            </div>
+            <div class="player-div">
+              <label>Player 2:</label>
+              <input class="text-box" type="text" id="player2Name" placeholder="Type username" required>
+            </div>
+          </div>
+          <button class="ui-button ui-button-full" type="submit">Start New Game</button>
+        </form>
+      </div>
+      <div class="savedlist-overlay">
+        <div class="saved-games-list"></div>
+      </div>
+      <div class="rules-overlay">
+        🎯 Scopul jocului
+        
+        Fiecare jucător își plasează flota pe propria tablă și încearcă să distrugă toate navele adversarului. În același timp, fiecare își alege o navă specială, numită Supply Boat, care poate aduce power-up-uri și schimba cursul jocului.
+
+        🚢 Flota și plasarea
+
+        Ambii jucători au aceeași flotă: Patrol Boat, Submarine, Destroyer, Battleship și Carrier, fiecare ocupând între 2 și 5 celule. Navele se plasează doar pe propria tablă, fie orizontal, fie vertical (poți folosi tasta R pentru rotire).
+
+        Navele nu se pot suprapune și nu se pot atinge între ele, nici măcar pe diagonală. După ce toate navele au fost plasate, fiecare jucător alege una dintre ele ca Supply Boat.
+
+        ⚔️ Desfășurarea jocului
+
+        După plasare, începe lupta. Jocul se desfășoară pe ture, iar în fiecare tură trebuie să alegi o singură acțiune:
+
+        ataci o celulă de pe tabla adversarului
+        folosești un power-up din inventar
+        trimiți Supply Boat în expediție
+
+        După orice acțiune, tura ta se încheie și jocul trece la celălalt jucător. Alegerea trebuie făcută cu atenție, deoarece nu poți combina acțiunile în aceeași tură.
+
+        🎯 Atacul și informația
+
+        Tabla adversarului este ascunsă. Când alegi o celulă, vei afla dacă ai lovit sau ai ratat, iar rezultatul rămâne vizibil pentru restul jocului. Nu poți ataca aceeași celulă de două ori folosind atacul normal.
+
+        Unele power-up-uri pot dezvălui informații suplimentare despre poziția navelor.
+
+        📦 Supply Boat
+
+        Supply Boat nu generează automat power-up-uri — trebuie să o folosești activ.
+
+        Când o trimiți în expediție, aceasta pleacă și se întoarce după două ture ale tale, aducând un power-up aleator. Dacă este distrusă înainte să se întoarcă, pierzi acel power-up.
+
+        Poți avea maximum două power-up-uri în inventar. Dacă inventarul este plin, cel mai vechi power-up este eliminat.
+
+        ⚡ Power-up-uri
+
+        Power-up-urile oferă avantaje strategice și pot schimba situația în joc:
+
+        Shield protejează o celulă ocupată de o navă și absoarbe primul hit.
+        Missile lovește celula selectată și diagonalele din jur.
+        Nuke provoacă damage într-o zonă mai mare, afectând mai multe celule.
+        Ping Bullet revelează întreaga navă dacă o nimerește sau marchează celula dacă ratează.
+        White Flag activează un efect special: următoarea navă din care este distrusă o celulă va fi distrusă complet instant, indiferent dacă este a ta sau a adversarului. După activare, efectul se dezactivează.
+
+        🚫 Restricții importante
+
+        Power-up-urile ofensive se folosesc doar pe tabla adversarului, iar Shield doar pe propria flotă. Fiecare acțiune consumă întreaga tură.
+
+        👁 Vizibilitate și schimbul de ture
+
+        La schimbarea turei, informațiile sunt ascunse pentru a preveni avantajele nedrepte, iar jocul afișează un overlay înainte ca următorul jucător să continue.
+
+        🏆 Câștigul
+
+        Câștigă jucătorul care reușește să distrugă complet flota adversarului.
+
+        💾 Salvare
+
+        Jocul permite salvarea și încărcarea unei partide în orice moment din meniu.
+      </div>
+    <div class="page-div">
+      <div class = "game-grid">
+        <div class="board" id="player1-board">
+          <div class="board-cover-div hidden" id="cover1"></div>
+        </div>
+        <div class="board" id="player2-board">
+          <div class="board-cover-div hidden" id="cover2"></div>
+        </div>
+      </div>
+      <div class="game-details">
+        <div class="boat-selection">
+          <div class="button-div">
+            Patrol Boat <button class="boat-select-button" id="patrolBoat" onclick="selectBoat(id)">x2</button>
+          </div>
+          <div class="button-div">
+            Submarine <button class="boat-select-button" id="submarine" onclick="selectBoat(id)">x2</button>
+          </div>
+          <div class="button-div">
+            Destroyer <button class="boat-select-button" id="destroyer" onclick="selectBoat(id)">x1</button>
+          </div>
+          <div class="button-div">
+            Battleship <button class="boat-select-button" id="battleship" onclick="selectBoat(id)">x1</button>
+          </div>
+          <div class="button-div">
+            Carrier <button class="boat-select-button" id="carrier" onclick="selectBoat(id)">x1</button>
+          </div>
+        </div>
+        <div class="fleet-hud">
+          
+        </div>
+        <div class="player-inventory-div">
+          <div class="inventory-title">Inventory</div>
+          <div class="player-inventory">
+            <div class="empty-inventory-text">empty!</div>
+          </div>
+        </div>
+        <div class="game-stats">
+          <div class="stats-panel">
+            <div>Current Turn</div>
+            <div id="currentPlayer"></div>
+            <div id="gamePhase"></div>
+          </div>
+          <div class="stats-panel">
+            <div>Supply Boat</div>
+            <div id="supply-delay"></div>
+            <div id="supply-status"></div>
+          </div>
+          <div class="stats-panel">
+            <div>Selected Action</div>
+            <div id="selected-powerup"></div>
+            <div id="powrup-hint"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    
+    <script src="script.js"></script>
+  </body>
+</html>
