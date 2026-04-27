@@ -34,7 +34,7 @@ body {
 .game-stats {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
   flex: 1;
   background-color: #292929;
   color: white;
@@ -525,6 +525,7 @@ body {
   justify-content: center;
   width: 100%;
   max-height: 108px;
+  min-height: 90px;
   box-sizing: border-box;
   padding: 8px 10px;
   border: 1px solid rgba(255, 255, 255, 0.608);
