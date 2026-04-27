@@ -108,6 +108,14 @@ function deselectButton(id) {
   document.getElementById(id).classList.remove("selected");
 }
 
+function clearButton(id) {
+  if (id === "") {
+    return;
+  }
+  document.getElementById(id).classList.remove("selected");
+  document.getElementById(id).classList.add("cleared-button");
+}
+
 /* =========================
    4. PLAYER & BOARD SETUP
 ========================= */
@@ -397,7 +405,7 @@ async function showSavedGames() {
     renderSavedGamesList(data);
   } catch (error) {
     console.error("Eroare la obtinerea listei de salvari:", error);
-    alert("A apÄƒrut o eroare la obtinerea listei de salvari.");
+    alert("A aparut o eroare la obtinerea listei de salvari.");
   }
 }
 
@@ -413,7 +421,7 @@ async function getSave(id) {
     loadGame(data);
   } catch (error) {
     console.error("Eroare la obtinerea salvarii:", error);
-    alert("A apÄƒrut o eroare la obtinerea salvarii.");
+    alert("A aparut o eroare la obtinerea salvarii.");
   }
 }
 
@@ -500,6 +508,7 @@ function renderInventory(playerId) {
         }
         selectButton(selectedPowerupId);
       }
+      renderGameStats(playerId, "");
     });
 
     inventoryDiv.appendChild(powerupDiv);
@@ -535,22 +544,33 @@ function revealBoat() {
 
 function renderBoatButtons(playerId) {
   document.getElementById("patrolBoat").innerHTML = "x" + player[playerId].boatType.patrolBoat;
+  document.getElementById("patrolBoat").classList.remove("cleared-button");
   document.getElementById("submarine").innerHTML = "x" + player[playerId].boatType.submarine;
+  document.getElementById("submarine").classList.remove("cleared-button");
   document.getElementById("destroyer").innerHTML = "x" + player[playerId].boatType.destroyer;
+  document.getElementById("destroyer").classList.remove("cleared-button");
   document.getElementById("battleship").innerHTML = "x" + player[playerId].boatType.battleship;
+  document.getElementById("battleship").classList.remove("cleared-button");
   document.getElementById("carrier").innerHTML = "x" + player[playerId].boatType.carrier;
+  document.getElementById("carrier").classList.remove("cleared-button");
 }
 
 function selectBoat(id) {
-  if (id != lastPressedButtonId) {
+  if (player[currentPlayer].boatType[id] === 0) {
+    return;
+  }
+  if (id === lastPressedButtonId) {
+    deselectButton(lastPressedButtonId);
+    lastPressedButtonId = "";
+    currentBoatType = "";
+    currentBoatSize = 0;
+    renderGameStats(currentPlayer);
+    return;
+  } else {
     deselectButton(lastPressedButtonId);
     selectButton(id);
     lastPressedButtonId = id;
   }
-  if (player[currentPlayer].boatType[id] === 0) {
-    return;
-  }
-
   orientation = "horizontal";
   currentBoatType = id;
 
@@ -563,6 +583,7 @@ function selectBoat(id) {
   } else {
     currentBoatSize = 5;
   }
+  renderGameStats(currentPlayer, "");
 }
 
 function isSupplyBoat() {
@@ -662,12 +683,13 @@ function showNukePreview() {
 function showBattlePreview() {
   if (isSupplyBoat()) {
     if (supplyBoatReady() && !isSupplyBoatDestroyed(currentPlayer)) {
+      renderGameStats(currentPlayer, "supplyExpedition");
       let board = hoveredCell.board;
       let id = hoveredCell.cellData.placedBoatId;
       for (let i = 0; i < BOARD_SIZE; ++i) {
         for (let j = 0; j < BOARD_SIZE; ++j) {
           if (board[i][j].placedBoatId === id) {
-            board[i][j].div.style.opacity = 0.4;
+            board[i][j].div.classList.add("selected");
             currentBoatCells.push({ x: i, y: j });
           }
         }
@@ -769,7 +791,8 @@ function deletePreview() {
           }
         }
       } else if (board[x][y].boardId === "player" + currentPlayer + "-board") {
-        board[x][y].div.style.opacity = 1;
+        board[x][y].div.classList.remove("selected");
+        renderGameStats(currentPlayer, "");
       } else if (board[x][y].cellHit === false) {
         board[x][y].div.classList.remove("preview-attack");
         if (board[x][y].shieldState === 1) {
@@ -818,9 +841,38 @@ function renderGame() {
    9. HUD & OVERLAYS
 ========================= */
 
+function isGameDone(playerId) {
+  if (gamePhase !== "battle") {
+    return false;
+  }
+  let board = player[playerId].board;
+  for (let i = 0; i < BOARD_SIZE; ++i) {
+    for (let j = 0; j < BOARD_SIZE; ++j) {
+      if (board[i][j].placedBoatId != 0 && board[i][j].cellHit === false) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+function closeGame() {
+  location.reload()
+}
+
 function showOverlay() {
   document.getElementById("cover1").classList.remove("hidden");
   document.getElementById("cover2").classList.remove("hidden");
+  if (isGameDone(otherPlayer())) {
+    const endOverlay = document.querySelector(".end-overlay");
+    endOverlay.style.display = "flex";
+    endOverlay.style.pointerEvents = "none";
+    document.querySelector(".end-overlay-text").innerHTML = `Jucătorul ${player[currentPlayer].name} a caștigat! <br> (click oriunde pentru a deschide meniul)`;
+    setTimeout(() => {
+      endOverlay.style.pointerEvents = "auto";
+    }, 2000);
+    return;
+  }
   document.querySelector(".overlay").style.display = "flex";
   document.querySelector(".overlay-text").innerHTML = `Este randul lui ${player[otherPlayer()].name} <br> (click oriunde pentru a continua)`;
 }
@@ -844,6 +896,12 @@ function renderPlayerColour(playerId) {
   for (let i = 0; i < powerUps.length; i++) {
     powerUps[i].classList.remove(removeClass);
     powerUps[i].classList.add(className);
+  }
+
+  let statPanels = document.querySelectorAll(".stats-panel");
+  for (let i = 0; i < statPanels.length; i++) {
+    statPanels[i].classList.remove(removeClass);
+    statPanels[i].classList.add(className);
   }
 }
 
@@ -982,11 +1040,8 @@ function startGame() {
   renderInventory(currentPlayer);
   renderBoatButtons(currentPlayer);
   renderPlayerColour(currentPlayer);
-  renderGameStats(currentPlayer);
-
-  if (player[currentPlayer].totalBoats != 7) {
-    renderFleet(currentPlayer);
-  }
+  renderGameStats(currentPlayer, "");
+  renderFleet(currentPlayer);
 
   for (let i = 0; i < BOARD_SIZE; ++i) {
     for (let j = 0; j < BOARD_SIZE; ++j) {
@@ -1000,9 +1055,73 @@ gamePhaseName["placement"] = "Place your boats";
 gamePhaseName["supplyPlacement"] = "Select your supply boat";
 gamePhaseName["battle"] = "Battle";
 
-function renderGameStats(playerId) {
+function renderGameStats(playerId, request) {
   document.getElementById("currentPlayer").innerHTML = `Player ${playerId}: ${player[playerId].name}`;
-  document.getElementById("gamePhase").innerHTML = `Phase: ${gamePhaseName[gamePhase]}`
+  document.getElementById("gamePhase").innerHTML = `Phase: ${gamePhaseName[gamePhase]}`;
+  
+  const selectedAction = document.getElementById("selected-action");
+  const selectedActionHint = document.getElementById("selected-hint");
+
+  if (gamePhase === "placement") {
+    if (!currentBoatType) {
+      selectedAction.innerHTML = "";
+    } else {
+      selectedAction.innerHTML = BOAT_NAME_BY_TYPE[currentBoatType];
+      if (player[playerId].boatType[currentBoatType] === 0) {
+        selectedAction.innerHTML = "No more boats of this type";
+      }
+    }
+
+  } else if (gamePhase === "supplyPlacement") {
+    selectedAction.innerHTML = "";
+    if (hoveredCell === null) {
+      return;
+    }
+    if (isOtherBoard(hoveredCell.cellData.boardId)) {
+      return;
+    }
+    if (hoveredCell.cellData.placedBoatId === 0) {
+      return;
+    }
+    selectedAction.innerHTML = "Make this boat your supply boat";
+
+  } else if (gamePhase === "battle") {
+    selectedAction.innerHTML = "";
+    selectedActionHint.innerHTML = "";
+
+    if (request === "supplyExpedition") {
+      selectedAction.innerHTML = "Supply Boat";
+      selectedActionHint.innerHTML = "Send the Supply Boat on an expedition. It returns after 2 turns with a power-up.";
+      return;
+    }
+
+    if (selectedPowerup === "shield") {
+      selectedAction.innerHTML = "Shield";
+      selectedActionHint.innerHTML = "Select a cell from one of your ships. The shield absorbs the first hit on that cell.";
+
+    } else if (selectedPowerup === "pingBullet") {
+      selectedAction.innerHTML = "Ping Bullet";
+      selectedActionHint.innerHTML = "Select any enemy cell, even a previously hit one. If it belongs to a ship, the entire ship is revealed.";
+
+    } else if (selectedPowerup === "missile") {
+      selectedAction.innerHTML = "Missile";
+      selectedActionHint.innerHTML = "Select an enemy cell. The missile hits the target and the 4 diagonal cells around it.";
+
+    } else if (selectedPowerup === "fatMan") {
+      selectedAction.innerHTML = "Nuke";
+      selectedActionHint.innerHTML = "Select an enemy cell. The nuke hits all cells within a circular radius of 2.";
+
+    } else if (selectedPowerup === "whiteFlag") {
+      selectedAction.innerHTML = "White Flag";
+      selectedActionHint.innerHTML = "Completely destroys the next ship hit, regardless of the owner. Remains active until triggered.";
+
+    } else {
+      selectedAction.innerHTML = "Normal Attack";
+      selectedActionHint.innerHTML = "Target an enemy cell and fire.";
+    }
+  }
+
+  //supply boat stats
   const supplyDelayDiv = document.getElementById("supply-delay");
   const supplyBoatStatus = document.getElementById("supply-status");
   supplyDelayDiv.innerHTML = "";
@@ -1071,7 +1190,7 @@ function switchTurn() {
 
   renderInventory(currentPlayer);
   renderPlayerColour(currentPlayer);
-  renderGameStats(currentPlayer);
+  renderGameStats(currentPlayer, "");
   document.querySelector(".overlay").style.display = "none";
   document.getElementById("cover1").classList.add("hidden");
   document.getElementById("cover2").classList.add("hidden");
@@ -1147,12 +1266,14 @@ function createBoard(board, boardId) {
             let newNumber = player[currentPlayer].boatType[currentBoatType];
             document.getElementById(currentBoatType).innerHTML = "x" + newNumber;
             if (newNumber === 0) {
+              renderGameStats(currentPlayer, "");
+              clearButton(currentBoatType);
               currentBoatSize = 0;
               currentBoatType = "";
             }
             if (player[currentPlayer].totalBoats == 0) {
               gamePhase = "supplyPlacement";
-              renderGameStats(currentPlayer);
+              renderGameStats(currentPlayer, "");
               renderGame();
             }
 
@@ -1255,6 +1376,9 @@ function createBoard(board, boardId) {
           cellData: cellDiv.cellData,
           div: cellDiv
         };
+        if (gamePhase === "supplyPlacement") {
+          renderGameStats(currentPlayer, "");
+        }
         if (!isValidMove(boardId)) {
           return;
         }

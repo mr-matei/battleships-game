@@ -10,6 +10,9 @@
     <div class="overlay" onclick="switchTurn()">
       <div class="overlay-text"></div>
     </div>
+    <div class="end-overlay" onclick="closeGame()">
+      <div class="end-overlay-text"></div>
+    </div>
     <button class="menu-button" onclick="openSidebar()" id="openButton"></button>
       <div class="sidebar">
         <button class="menu-button" onclick="closeSidebar()" id="closeButton"></button>
@@ -135,19 +138,19 @@
         </div>
         <div class="game-stats">
           <div class="stats-panel">
-            <div>Current Turn</div>
-            <div id="currentPlayer"></div>
-            <div id="gamePhase"></div>
+            <div class="stats-label">Current Turn</div>
+            <div class="stats-value" id="currentPlayer"></div>
+            <div class="stats-meta" id="gamePhase"></div>
           </div>
           <div class="stats-panel">
-            <div>Supply Boat</div>
-            <div id="supply-delay"></div>
-            <div id="supply-status"></div>
+            <div class="stats-label">Selected Action</div>
+            <div class="stats-value" id="selected-action"></div>
+            <div class="stats-meta" id="selected-hint"></div>
           </div>
           <div class="stats-panel">
-            <div>Selected Action</div>
-            <div id="selected-powerup"></div>
-            <div id="powrup-hint"></div>
+            <div class="stats-label">Supply Boat</div>
+            <div class="stats-value" id="supply-status"></div>
+            <div class="stats-meta" id="supply-delay"></div>
           </div>
         </div>
       </div>
